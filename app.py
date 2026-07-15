@@ -1,9 +1,12 @@
 from flask import Flask, render_template, request, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
+import os
 
 app = Flask(__name__)
-# Database အသစ်စက်စက်နဲ့ စရအောင် နာမည်အသစ်ပေးလိုက်ပါ
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///social_final.db'
+
+# Render မှာ Database ဖိုင်ကို /tmp/ folder ထဲမှာပဲ ဆောက်ခိုင်းပါမယ်
+basedir = os.path.abspath(os.path.dirname(__file__))
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'app.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
@@ -19,7 +22,7 @@ class Post(db.Model):
     content = db.Column(db.String(200), nullable=False)
     author_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
 
-# Database ဇယားများ အမှန်တကယ် ဆောက်ရန် (အရေးကြီးဆုံး)
+# App Context ထဲမှာ Database ဆောက်ပေးပါ
 with app.app_context():
     db.create_all()
 
@@ -28,4 +31,4 @@ def home():
     return render_template('home.html')
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run()
