@@ -3,7 +3,11 @@ from flask_sqlalchemy import SQLAlchemy
 import os
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///social_app_v2.db'app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+# Database Configuration
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///social_app_v3.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
 db = SQLAlchemy(app)
 
 # Database Models
@@ -17,7 +21,7 @@ class Post(db.Model):
     content = db.Column(db.String(200), nullable=False)
     author_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
 
-# Database ကို အသစ်ပြန်ဆောက်ရန်
+# Initialize Database
 with app.app_context():
     db.create_all()
 
