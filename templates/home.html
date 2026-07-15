@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Social App</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f0f2f5; margin: 0; padding: 20px; }
+        .container { max-width: 600px; margin: 0 auto; }
+        .header { display: flex; justify-content: space-between; align-items: center; background: white; padding: 15px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
+        .post-form { background: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
+        .post-form textarea { width: 100%; height: 80px; padding: 10px; box-sizing: border-box; border: 1px solid #ddd; border-radius: 6px; resize: none; }
+        .post-card { background: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
+        .post-header { font-weight: bold; margin-bottom: 10px; color: #1c1e21; }
+        .post-image { max-width: 100%; border-radius: 8px; margin-top: 10px; }
+        .actions { display: flex; gap: 10px; margin: 15px 0 5px 0; border-top: 1px solid #f0f2f5; border-bottom: 1px solid #f0f2f5; padding: 10px 0; }
+        .like-btn { background: #f0f2f5; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: bold; color: #65676b; }
+        .like-btn:hover { background: #e4e6eb; }
+        .comment-section { background: #f0f2f5; padding: 12px; border-radius: 8px; margin-top: 10px; }
+        .comment { margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px solid #e4e6eb; font-size: 14px; }
+        .comment:last-child { margin-bottom: 0; padding-bottom: 0; border-bottom: none; }
+        .comment-form { display: flex; gap: 8px; margin-top: 10px; }
+        .comment-form input { flex-grow: 1; padding: 8px; border: 1px solid #ddd; border-radius: 20px; padding-left: 15px; }
+        .comment-form button { background: #1877f2; color: white; border: none; padding: 0 15px; border-radius: 20px; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h2>Hello, {{ user.username }}! 👋</h2>
+        <a href="{{ url_for('logout') }}" style="color: #65676b; text-decoration: none; font-weight: bold;">Logout</a>
+    </div>
+
+    <div class="post-form">
+        <form action="{{ url_for('create_post') }}" method="POST" enctype="multipart/form-data">
+            <textarea name="content" placeholder="What's on your mind?"></textarea>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">
+                <input type="file" name="file" accept="image/*">
+                <button type="submit" style="background: #1877f2; color: white; border: none; padding: 8px 16px; border-radius: 6px; font-weight: bold; cursor: pointer;">Post</button>
+            </div>
+        </form>
+    </div>
+
+    {% for post in posts %}
+    <div class="post-card">
+        <div class="post-header">{{ post.author.username }}</div>
+        <div style="font-size: 16px; color: #050505;">{{ post.content }}</div>
+        
+        {% if post.file_path %}
+            <img src="{{ url_for('uploaded_file', filename=post.file_path) }}" class="post-image">
+        {% endif %}
+
+        <div class="actions">
+            <form action="{{ url_for('like_post', post_id=post.id) }}" method="POST">
+                <button type="submit" class="like-btn">
+                    👍 Like ({{ post.likes|length }})
+                </button>
+            </form>
+        </div>
+
+        <div class="comment-section">
+            <div style="font-weight: bold; font-size: 13px; color: #65676b; margin-bottom: 8px;">Comments</div>
+            
+            {% for comment in post.comments %}
+            <div class="comment">
+                <strong>{{ comment.comment_author.username }}:</strong> {{ comment.content }}
+            </div>
+            {% else %}
+            <div style="font-size: 13px; color: #8a8d91; italic;">No comments yet.</div>
+            {% endfor %}
+
+            <form action="{{ url_for('add_comment', post_id=post.id) }}" method="POST" class="comment-form">
+                <input type="text" name="content" placeholder="Write a comment..." required>
+                <button type="submit">Send</button>
+            </form>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+</body>
+</html>
